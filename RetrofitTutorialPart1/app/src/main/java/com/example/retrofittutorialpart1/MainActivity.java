@@ -10,6 +10,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import okhttp3.OkHttpClient;
+import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -19,6 +21,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class MainActivity extends AppCompatActivity {
 
     private TextView textViewResult;
+
     private JsonPlaceHolderApi jsonPlaceHolderApi;
 
     @Override
@@ -28,9 +31,16 @@ public class MainActivity extends AppCompatActivity {
 
         textViewResult = findViewById(R.id.text_view_result);
 
+        HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
+        logging.setLevel(HttpLoggingInterceptor.Level.BODY);
+        OkHttpClient okHttpClient = new OkHttpClient.Builder()
+                .addInterceptor(logging)
+                .build();
+
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("https://jsonplaceholder.typicode.com/")
                 .addConverterFactory(GsonConverterFactory.create())
+                .client(okHttpClient)
                 .build();
 
         jsonPlaceHolderApi = retrofit.create(JsonPlaceHolderApi.class);
@@ -49,9 +59,9 @@ public class MainActivity extends AppCompatActivity {
 //        createPost();
 //        createPost(24,"New Title 24", "New Text 24");
 
-//        updatePost();
+        updatePost();
 
-        deletePosts(5);
+//        deletePosts(5);
     }
 
     private void getPosts() {
@@ -263,8 +273,8 @@ public class MainActivity extends AppCompatActivity {
 
     private void updatePost() {
         Post post = new Post(12, null, "New Text");
-//        Call<Post> call = jsonPlaceHolderApi.putPost(5, post);
-        Call<Post> call = jsonPlaceHolderApi.patchPost(5, post);
+        Call<Post> call = jsonPlaceHolderApi.putPost(5, post);
+//        Call<Post> call = jsonPlaceHolderApi.patchPost(5, post);
 
         call.enqueue(new Callback<Post>() {
             @Override
@@ -289,7 +299,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
-
 
     private void deletePosts(int id) {
         Call<Void> call = jsonPlaceHolderApi.deletePosts(id);

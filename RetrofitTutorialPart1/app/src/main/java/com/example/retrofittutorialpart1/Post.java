@@ -8,7 +8,7 @@ public class Post {
     private int userId;
 
     @SerializedName("id")
-    private int id;
+    private Integer id;
 
     @SerializedName("title")
     private String title;
